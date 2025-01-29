@@ -15,6 +15,20 @@ buildTextTitleVariation1(String text){
   );
 }
 
+buildTextTitleVariation3(String text){
+  return Padding(
+    padding: EdgeInsets.only(bottom: 8),
+    child: Text(
+      text,
+      style: GoogleFonts.breeSerif(
+        fontSize: 32,
+        fontWeight: FontWeight.w700,
+        color: Colors.black.withOpacity(.7),
+      ),
+    ),
+  );
+}
+
 buildTextTitleVariation2(String text, bool opacity){
   return Padding(
     padding: EdgeInsets.only(bottom: 16),

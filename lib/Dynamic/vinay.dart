@@ -3,9 +3,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:products_manager/detail.dart';
-
 import '../shared.dart';
 import 'model.dart';
+
 
 const kBoxShadow = [
   BoxShadow(
@@ -14,6 +14,7 @@ const kBoxShadow = [
     blurRadius: 6,
   ),
 ];
+
 
 const kPrimaryColor = Colors.green;
 
@@ -26,7 +27,28 @@ class _ExploreVinayState extends State<ExploreVinay> {
 
 
   List<bool> optionSelected = [true, false, false];
+
+
   List<RecipeModel> foodList = [];
+  List<RecipeModel> filteredRecipe = [];
+  final TextEditingController searchController = TextEditingController();
+
+
+
+  void filterRecipe(String query) {
+    List<RecipeModel> results = [];
+    if (query.isEmpty) {
+      results = foodList;
+    } else {
+      results = foodList
+          .where((food) => food.title.toLowerCase().contains(query.toLowerCase()) || food.description.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    }
+    setState(() {
+      filteredRecipe = results;
+    });
+  }
+
 
   Future<List<RecipeModel>> fetchRecipes() async {
     try {
@@ -41,6 +63,7 @@ class _ExploreVinayState extends State<ExploreVinay> {
       throw Exception('Error fetching recipes: $e');
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +116,9 @@ class _ExploreVinayState extends State<ExploreVinay> {
             ),
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: TextField(
+              controller: searchController,
               style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey[700]),
+              onChanged: filterRecipe,
               decoration: InputDecoration(
                 prefixIcon: Icon(Icons.search),
                 hintText: "Search Recipe",
@@ -140,13 +165,21 @@ class _ExploreVinayState extends State<ExploreVinay> {
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return const Center(child: Text('No recipes found.'));
           }
-          final recipes = snapshot.data!;
-          return ListView.builder(
+          if(foodList.isEmpty){
+            foodList = snapshot.data!;
+            filteredRecipe = List.from(foodList);
+          }
+
+          final recipeToShow = searchController.text.isEmpty? foodList : filteredRecipe;
+
+          return recipeToShow.isEmpty?
+          const Center(child: Text('No recipes match your search.')):
+          ListView.builder(
             physics: const BouncingScrollPhysics(),
             scrollDirection: Axis.horizontal,
-            itemCount: recipes.length,
+            itemCount: recipeToShow.length,
             itemBuilder: (context, index) {
-              final recipe = recipes[index];
+              final recipe = recipeToShow[index];
               return GestureDetector(
                 onTap: () {
                   Navigator.push(
@@ -164,6 +197,7 @@ class _ExploreVinayState extends State<ExploreVinay> {
       ),
     );
   }
+
 
   Widget _buildVerticalRecipeList() {
     return FutureBuilder<List<RecipeModel>>(
@@ -203,9 +237,7 @@ class _ExploreVinayState extends State<ExploreVinay> {
   Widget _buildOption(String text, String image, int index) {
     return GestureDetector(
       onTap: () {
-        setState(() {
-          optionSelected = List.generate(optionSelected.length, (i) => i == index);
-        });
+
       },
       child: Container(
         height: 40,
@@ -239,6 +271,7 @@ class _ExploreVinayState extends State<ExploreVinay> {
       ),
     );
   }
+
 
   Widget _buildRecipeCard(RecipeModel recipe, int index) {
     return Container(

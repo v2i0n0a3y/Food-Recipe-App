@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:products_manager/nav_bar.dart';
 
 import 'Dynamic/recipee.dart';
 import 'Dynamic/vinay.dart';
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
         textTheme: GoogleFonts.montserratTextTheme(),
       ),
       debugShowCheckedModeBanner: false,
-      home: ExploreVinay(),
+      home: MainMenu(),
     );
   }
 }
